@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Exitoso</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fc;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .success-icon {
+            color: #2ecc71;
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        .user-info {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .user-info p {
+            margin: 10px 0;
+        }
+        
+        .user-info strong {
+            display: inline-block;
+            width: 150px;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">✓</div>
+        <h1 id="welcomeMessage">¡Bienvenido!</h1>
+        <p>Tu registro ha sido completado exitosamente.</p>
+        
+        <div class="user-info" id="userInfo">
+            <h2>Información registrada:</h2>
+            <p><strong>Nombre:</strong> <span id="userName"></span></p>
+            <p><strong>Correo electrónico:</strong> <span id="userEmail"></span></p>
+            <p><strong>Fecha de nacimiento:</strong> <span id="userBirthDate"></span></p>
+        </div>
+        
+        <div class="buttons">
+            <a href="index.html" class="btn">Volver al inicio</a>
+            <a href="user-area.html" class="btn">Continuar al área de usuario</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Recuperar datos del registro
+            const registrationData = JSON.parse(localStorage.getItem('registrationData'));
+            
+            if (registrationData) {
+                // Mostrar mensaje de bienvenida personalizado
+                document.getElementById('welcomeMessage').textContent = `¡Bienvenido, ${registrationData.fullName}!`;
+                
+                // Mostrar información del usuario
+                document.getElementById('userName').textContent = registrationData.fullName;
+                document.getElementById('userEmail').textContent = registrationData.email;
+                
+                // Mostrar fecha de nacimiento si existe
+                if (registrationData.birthDate) {
+                    // Formatear la fecha
+                    const date = new Date(registrationData.birthDate);
+                    const formattedDate = date.toLocaleDateString('es-ES', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    });
+                    document.getElementById('userBirthDate').textContent = formattedDate;
+                } else {
+                    document.getElementById('userBirthDate').textContent = 'No proporcionada';
+                }
+            } else {
+                // Si no hay datos, redireccionar al formulario
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

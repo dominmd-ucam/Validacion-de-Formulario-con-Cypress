@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Registro</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fc;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input {
+            margin-right: 10px;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .form-group.error input {
+            border-color: #e74c3c;
+            background-color: #fdf0ee;
+        }
+
+        .form-group.error .error-message {
+            display: block;
+        }
+
+        .required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Formulario de Registro</h1>
+        <form id="registrationForm">
+            <div class="form-group" id="fullNameGroup">
+                <label for="fullName" class="required">Nombre completo</label>
+                <input type="text" id="fullName" name="fullName" data-testid="fullName">
+                <div class="error-message" id="fullNameError">Por favor, ingrese su nombre completo</div>
+            </div>
+
+            <div class="form-group" id="emailGroup">
+                <label for="email" class="required">Correo electrónico</label>
+                <input type="email" id="email" name="email" data-testid="email">
+                <div class="error-message" id="emailError">Por favor, ingrese un correo electrónico válido</div>
+            </div>
+
+            <div class="form-group" id="passwordGroup">
+                <label for="password" class="required">Contraseña</label>
+                <input type="password" id="password" name="password" data-testid="password">
+                <div class="error-message" id="passwordError">La contraseña debe tener al menos 8 caracteres, una letra
+                    mayúscula, una minúscula y un número</div>
+            </div>
+
+            <div class="form-group" id="confirmPasswordGroup">
+                <label for="confirmPassword" class="required">Confirmar contraseña</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" data-testid="confirmPassword">
+                <div class="error-message" id="confirmPasswordError">Las contraseñas no coinciden</div>
+            </div>
+
+            <div class="form-group" id="birthDateGroup">
+                <label for="birthDate">Fecha de nacimiento</label>
+                <input type="date" id="birthDate" name="birthDate" data-testid="birthDate">
+            </div>
+
+            <div class="checkbox-group" id="termsGroup">
+                <input type="checkbox" id="terms" name="terms" data-testid="terms">
+                <label for="terms" class="required">Acepto los términos y condiciones</label>
+                <div class="error-message" id="termsError">Debe aceptar los términos y condiciones para continuar</div>
+            </div>
+
+            <button type="submit" id="submitButton" data-testid="submitButton">Registrarse</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registrationForm');
+    const submitButton = document.getElementById('submitButton');
+    // Variable para controlar si el formulario ha sido sometido
+    let formSubmitted = false;
+
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+    
+    function isValidPassword(password) {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+        return passwordRegex.test(password);
+    }
+    
+    function showError(fieldId, errorId, errorMessage) {
+        const field = document.getElementById(fieldId);
+        const errorElement = document.getElementById(errorId);
+        const formGroup = document.getElementById(fieldId + 'Group');
+        
+        formGroup.classList.add('error');
+        errorElement.textContent = errorMessage;
+        return false;
+    }
+    
+    function clearError(fieldId) {
+        const formGroup = document.getElementById(fieldId + 'Group');
+        formGroup.classList.remove('error');
+        return true;
+    }
+    
+    // Función para validar el formulario completo
+    function validateForm(validateAll = false) {
+        let isValid = true;
+        
+        // Validamos todo si se ha hecho submit o si se solicita validación completa
+        if (formSubmitted || validateAll) {
+            // Validar nombre
+            const fullName = document.getElementById('fullName').value.trim();
+            if (!fullName) {
+                isValid = showError('fullName', 'fullNameError', 'Por favor, ingrese su nombre completo');
+            } else {
+                clearError('fullName');
+            }
+            
+            // Validar email
+            const email = document.getElementById('email').value.trim();
+            if (!email) {
+                isValid = showError('email', 'emailError', 'Por favor, ingrese su correo electrónico');
+            } else if (!isValidEmail(email)) {
+                isValid = showError('email', 'emailError', 'Por favor, ingrese un correo electrónico válido');
+            } else {
+                clearError('email');
+            }
+            
+            // Validar contraseña
+            const password = document.getElementById('password').value;
+            if (!password) {
+                isValid = showError('password', 'passwordError', 'Por favor, ingrese una contraseña');
+            } else if (!isValidPassword(password)) {
+                isValid = showError('password', 'passwordError', 'La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula y un número');
+            } else {
+                clearError('password');
+            }
+            
+            // Validar confirmación de contraseña
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            if (!confirmPassword) {
+                isValid = showError('confirmPassword', 'confirmPasswordError', 'Por favor, confirme su contraseña');
+            } else if (password !== confirmPassword) {
+                isValid = showError('confirmPassword', 'confirmPasswordError', 'Las contraseñas no coinciden');
+            } else {
+                clearError('confirmPassword');
+            }
+            
+            // Validar términos y condiciones
+            const terms = document.getElementById('terms').checked;
+            if (!terms) {
+                isValid = showError('terms', 'termsError', 'Debe aceptar los términos y condiciones para continuar');
+            } else {
+                clearError('terms');
+            }
+        }
+        
+        // Habilitar o deshabilitar el botón de envío
+        submitButton.disabled = !isValid && formSubmitted;
+        
+        return isValid;
+    }
+    
+    // Añadimos una función para forzar la validación (para pruebas)
+    window.forceValidation = function() {
+        formSubmitted = true;
+        return validateForm(true);
+    };
+    
+    // Validar cada campo individualmente cuando el usuario interactúa con él
+    const fields = ['fullName', 'email', 'password', 'confirmPassword', 'terms'];
+    fields.forEach(field => {
+        const element = document.getElementById(field);
+        const eventType = field === 'terms' ? 'change' : 'input';
+        
+        element.addEventListener(eventType, function() {
+            // Si ya se hizo submit, validamos este campo específico
+            if (formSubmitted) {
+                validateField(field);
+            }
+        });
+    });
+    
+    // Función para validar solo un campo individual
+    function validateField(fieldId) {
+        let isValid = true;
+        
+        switch(fieldId) {
+            case 'fullName':
+                const fullName = document.getElementById('fullName').value.trim();
+                if (!fullName) {
+                    isValid = showError('fullName', 'fullNameError', 'Por favor, ingrese su nombre completo');
+                } else {
+                    clearError('fullName');
+                }
+                break;
+                
+            case 'email':
+                const email = document.getElementById('email').value.trim();
+                if (!email) {
+                    isValid = showError('email', 'emailError', 'Por favor, ingrese su correo electrónico');
+                } else if (!isValidEmail(email)) {
+                    isValid = showError('email', 'emailError', 'Por favor, ingrese un correo electrónico válido');
+                } else {
+                    clearError('email');
+                }
+                break;
+                
+            case 'password':
+                const password = document.getElementById('password').value;
+                if (!password) {
+                    isValid = showError('password', 'passwordError', 'Por favor, ingrese una contraseña');
+                } else if (!isValidPassword(password)) {
+                    isValid = showError('password', 'passwordError', 'La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una minúscula y un número');
+                } else {
+                    clearError('password');
+                    // Validar también confirmPassword si ya tiene valor
+                    if (document.getElementById('confirmPassword').value) {
+                        validateField('confirmPassword');
+                    }
+                }
+                break;
+                
+            case 'confirmPassword':
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                const passwordValue = document.getElementById('password').value;
+                if (!confirmPassword) {
+                    isValid = showError('confirmPassword', 'confirmPasswordError', 'Por favor, confirme su contraseña');
+                } else if (passwordValue !== confirmPassword) {
+                    isValid = showError('confirmPassword', 'confirmPasswordError', 'Las contraseñas no coinciden');
+                } else {
+                    clearError('confirmPassword');
+                }
+                break;
+                
+            case 'terms':
+                const terms = document.getElementById('terms').checked;
+                if (!terms) {
+                    isValid = showError('terms', 'termsError', 'Debe aceptar los términos y condiciones para continuar');
+                } else {
+                    clearError('terms');
+                }
+                break;
+        }
+        
+        // Actualizar estado del botón
+        updateSubmitButton();
+        
+        return isValid;
+    }
+    
+    function updateSubmitButton() {
+        // Si no se ha hecho submit, mantener deshabilitado
+        if (!formSubmitted) {
+            submitButton.disabled = true;
+            return;
+        }
+        
+        // Comprobar si todos los campos son válidos
+        let allValid = true;
+        fields.forEach(field => {
+            const formGroup = document.getElementById(field + 'Group');
+            if (formGroup.classList.contains('error')) {
+                allValid = false;
+            }
+        });
+        
+        submitButton.disabled = !allValid;
+    }
+    
+    // Manejar el envío del formulario
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Indicar que se intentó enviar el formulario
+        formSubmitted = true;
+        
+        // Validar todo el formulario
+        if (validateForm(true)) {
+            // Recopilar datos del formulario
+            const formData = {
+                fullName: document.getElementById('fullName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                birthDate: document.getElementById('birthDate').value
+            };
+            
+            // Guardar datos para la página de confirmación
+            localStorage.setItem('registrationData', JSON.stringify(formData));
+            
+            // Redireccionar a la página de confirmación
+            window.location.href = 'confirmation.html';
+        }
+    });
+    
+    // No realizar validación inicial
+    submitButton.disabled = true;
+});
+    </script>
+</body>
+
+</html>
